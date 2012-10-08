@@ -1,0 +1,51 @@
+body {
+    background-color: white;
+}
+
+header, #repos, footer {
+    margin: 0 auto;
+    width: 420px;
+}
+
+#repos {
+    padding: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+#repos h2 {
+    margin: 0;
+}
+
+#repos ul {
+    padding: 0;
+    list-style: none;
+}
+
+#repos ul li {
+    padding: 0 5px;
+    border-bottom: 1px silver solid;
+    background-color: #eee;
+    text-shadow: 1px 1px 0 white;
+    line-height: 30px;
+}
+
+#repos ul li img {
+    border-radius: 10px;
+    vertical-align: middle;
+}
+
+#repos ul li time {
+    float: right;
+    color: gray;
+    font-size: 80%;
+}
+
+#repos ul .more {
+    text-align: center;
+    font-size: 80%;
+    line-height: 20px;
+}
+
+#repos ul .more a {
+    color: gray;
+}
