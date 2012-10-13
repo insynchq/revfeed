@@ -3,41 +3,31 @@
     <title>Revfeed</title>
     <link rel="stylesheet" href="/static/css/normalize.css">
     <link rel="stylesheet" href="/static/css/app.css">
-    <script src="/static/js/spine.js"></script>
-    <script src="/static/js/app.js"></script>
+    <script src="/static/js/components/jquery/jquery.js"></script>
+    <script src="/static/js/components/mustache/mustache.js"></script>
+    <script src="/static/js/components/spine/lib/spine.js"></script>
+    <script src="/static/js/components/spine/lib/ajax.js"></script>
+    <script src="/static/js/components/spine/lib/relation.js"></script>
+    <script src="/static/js/components/moment/moment.js"></script>
+    <script src="/static/js/lib/app.js"></script>
 </head>
 <body>
+    <script id="commit-template" type="text/html">
+        <% #author %>
+        <img src="<% avatar %>" alt="<% name %> <<% email %>>">
+        <% /author %>
+        <time><% formattedTime %></time>
+        <p class="message"><% message %></p>
+    </script>
+    <script id="repo-template" type="text/html">
+        <h2><% name %></h2>
+        <ul class="commits"></ul>
+        <div class="more"><a href="#">More&hellip;</a></div>
+    </script>
     <header>
         <h1>Revfeed</h1>
     </header>
-    <div id="repos">
-        <h2>Repo</h2>
-        <ul>
-            <li>
-                <img src="http://gravatar.com/avatar/a6d17cf134d9b595c38a8d9db9008508.jpg?s=20">
-                Bump version
-                <time>11:30 AM - 8 Oct 12</time>
-            </li>
-            <li>
-                <img src="http://gravatar.com/avatar/a6d17cf134d9b595c38a8d9db9008508.jpg?s=20">
-                Refactor
-                <time>11:20 AM - 8 Oct 12</time>
-            </li>
-            <li>
-                <img src="http://gravatar.com/avatar/a6d17cf134d9b595c38a8d9db9008508.jpg?s=20">
-                Add a feature
-                <time>11:10 AM - 8 Oct 12</time>
-            </li>
-            <li>
-                <img src="http://gravatar.com/avatar/a6d17cf134d9b595c38a8d9db9008508.jpg?s=20">
-                Initial commit
-                <time>11:00 AM - 8 Oct 12</time>
-            </li>
-            <li class="more">
-                <a href="#">More&hellip;</a>
-            </li>
-        </ul>
-    </div>
+    <div id="revfeed">Loading&hellip;</div>
     <footer>
         <p>
             By <a href="https://twitter.com/themarksteve" target="_blank">@themarksteve</a>

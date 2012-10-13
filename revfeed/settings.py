@@ -3,11 +3,11 @@ from os import environ
 
 # Defaults
 
-REDIS_HOST = 'localhost'
+REDIS_HOST = "localhost"
 REDIS_PORT = 6379
-REDIS_KEY_PREFIX = 'revfeed:cache:'
+REDIS_KEY_PREFIX = "revfeed:cache:"
 
-REPO_DIRS = ['./.git']
+REPO_DIRS = "./.git"
 
 
 # Get config from ENV
@@ -19,3 +19,6 @@ for key in _locals.keys():
         value = environ.get(key)
         if value:
             _locals[key] = value
+
+
+REPO_DIRS = REPO_DIRS.split(',')

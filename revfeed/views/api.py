@@ -1,3 +1,4 @@
+import hashlib
 import os.path
 
 from pygit2 import Repository, GIT_SORT_TIME
@@ -5,6 +6,16 @@ from flask import Blueprint, current_app, request, jsonify, url_for
 
 
 api = Blueprint('api', __name__, url_prefix='/api')
+
+
+def _gravatar(email):
+    url = _gravatar.cache.get(email)
+    if not url:
+        url = _gravatar.cache[email] = (
+            "https://gravatar.com/avatar/%s?size=20" %
+            hashlib.md5(email).hexdigest())
+    return url
+_gravatar.cache = {}
 
 
 def _get_repo_name(repo):
@@ -23,15 +34,16 @@ def _get_commits(repo, start, count):
 
 def _commit_to_dict(commit):
     return {
+        'id': commit.hex,
         'hex': commit.hex,
         'author': {
-            'name': commit.author.name,
+            'id': commit.author.email,
             'email': commit.author.email,
-            'time': commit.author.time,
-            'offset': commit.author.offset,
+            'name': commit.author.name,
         },
         'message': commit.message,
-        'avatar': None,
+        'avatar': _gravatar(commit.author.email),
+        'time': (commit.author.time - (commit.author.offset * 60)) * 1000,
     }
 
 
@@ -44,12 +56,13 @@ def _repo_to_dict(repo, start=None, count=10):
         walker = repo.walk(commits[-1]['hex'], GIT_SORT_TIME)
         walker.next()  # prep
         try:
-            next = url_for('.api_repos', repo=name, start=walker.next().hex)
+            next = url_for('.repos', repo=name, start=walker.next().hex)
         except StopIteration:
             next = None
     else:
         next = None
     return {
+        'id': repo.path,
         'path': repo.path,
         'name': name,
         'commits': commits,
