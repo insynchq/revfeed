@@ -43,7 +43,7 @@ def _commit_to_dict(commit):
         },
         'message': commit.message,
         'avatar': _gravatar(commit.author.email),
-        'time': (commit.author.time - (commit.author.offset * 60)) * 1000,
+        'time': (commit.author.time + (commit.author.offset * 60)) * 1000,
     }
 
 

@@ -4,7 +4,7 @@ class Commit extends Spine.Model
     @configure "Commit", "author", "message", "time"
     @belongsTo "repo", "Repo"
     formattedTime: =>
-        moment(@time).calendar()
+        moment.utc(@time).calendar()
 
 class Repo extends Spine.Model
     @configure "Repo", "name", "path", "commits"

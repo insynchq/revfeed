@@ -18,7 +18,7 @@ Commit = (function(_super) {
   Commit.belongsTo("repo", "Repo");
 
   Commit.prototype.formattedTime = function() {
-    return moment(this.time).calendar();
+    return moment.utc(this.time).calendar();
   };
 
   return Commit;
