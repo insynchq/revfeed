@@ -56,7 +56,7 @@ header, #revfeed, footer {
 
 .repo .commits li time {
     float: right;
-    color: gray;
+    color: #595959;
     font-size: 80%;
 }
 

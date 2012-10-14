@@ -7,7 +7,7 @@ class Commit extends Spine.Model
         moment.utc(@time).calendar()
 
 class Repo extends Spine.Model
-    @configure "Repo", "name", "path", "commits"
+    @configure "Repo", "name", "path", "commits", "start", "next"
     @hasMany "commits", "Commit"
     @extend Spine.Model.Ajax
     @extend
@@ -15,7 +15,10 @@ class Repo extends Spine.Model
         fromJSON: (objects) ->
             unless objects
                 return
-            new Repo(repo) for repo in objects.repos
+            if objects?.repos
+                new Repo(repo) for repo in objects.repos
+            else
+                new Repo(objects)
     constructor: (objects) ->
         super
         @commits().create(commit) for commit in objects.commits
@@ -40,14 +43,10 @@ class Repos extends Spine.Controller
     tag: "div"
     className: "repo"
     events:
-        "click .more": "more"
+        "click .more a": "more"
     elements:
         ".commits": "$commits"
         ".more": "$more"
-    constructor: ->
-        super
-        @item.commits().model.bind("refresh", @addCommits)
-        @item.commits().model.bind("create", @addCommit)
     render: =>
         @html(Templates.repo(@item))
         @addCommits(@item.commits().all())
@@ -59,9 +58,18 @@ class Repos extends Spine.Controller
         @$commits.append(view.render().el)
     addCommits: (commits) =>
         commits.map(@addCommit)
-    more: =>
-        unless @item.next
-            @$(".more").hide();
+    more: (e) =>
+        e.preventDefault()
+        if @item.next
+            @item.ajax().reload
+                url: @item.next
+                success: @proxy((objects) ->
+                    for commit in objects.commits
+                        @item.commits().create(commit)
+                        @addCommit(@item.commits().last())
+                    unless objects.next
+                        @$(".more").hide()
+                    )
         return
 
 class Commits extends Spine.Controller

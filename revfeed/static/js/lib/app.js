@@ -29,7 +29,7 @@ Repo = (function(_super) {
 
   __extends(Repo, _super);
 
-  Repo.configure("Repo", "name", "path", "commits");
+  Repo.configure("Repo", "name", "path", "commits", "start", "next");
 
   Repo.hasMany("commits", "Commit");
 
@@ -42,13 +42,17 @@ Repo = (function(_super) {
       if (!objects) {
         return;
       }
-      _ref = objects.repos;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        repo = _ref[_i];
-        _results.push(new Repo(repo));
+      if (objects != null ? objects.repos : void 0) {
+        _ref = objects.repos;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          repo = _ref[_i];
+          _results.push(new Repo(repo));
+        }
+        return _results;
+      } else {
+        return new Repo(objects);
       }
-      return _results;
     }
   });
 
@@ -101,19 +105,6 @@ Repos = (function(_super) {
 
   __extends(Repos, _super);
 
-  Repos.prototype.tag = "div";
-
-  Repos.prototype.className = "repo";
-
-  Repos.prototype.events = {
-    "click .more": "more"
-  };
-
-  Repos.prototype.elements = {
-    ".commits": "$commits",
-    ".more": "$more"
-  };
-
   function Repos() {
     this.more = __bind(this.more, this);
 
@@ -122,10 +113,21 @@ Repos = (function(_super) {
     this.addCommit = __bind(this.addCommit, this);
 
     this.render = __bind(this.render, this);
-    Repos.__super__.constructor.apply(this, arguments);
-    this.item.commits().model.bind("refresh", this.addCommits);
-    this.item.commits().model.bind("create", this.addCommit);
+    return Repos.__super__.constructor.apply(this, arguments);
   }
+
+  Repos.prototype.tag = "div";
+
+  Repos.prototype.className = "repo";
+
+  Repos.prototype.events = {
+    "click .more a": "more"
+  };
+
+  Repos.prototype.elements = {
+    ".commits": "$commits",
+    ".more": "$more"
+  };
 
   Repos.prototype.render = function() {
     this.html(Templates.repo(this.item));
@@ -148,9 +150,24 @@ Repos = (function(_super) {
     return commits.map(this.addCommit);
   };
 
-  Repos.prototype.more = function() {
-    if (!this.item.next) {
-      this.$(".more").hide();
+  Repos.prototype.more = function(e) {
+    e.preventDefault();
+    if (this.item.next) {
+      this.item.ajax().reload({
+        url: this.item.next,
+        success: this.proxy(function(objects) {
+          var commit, _i, _len, _ref;
+          _ref = objects.commits;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            commit = _ref[_i];
+            this.item.commits().create(commit);
+            this.addCommit(this.item.commits().last());
+          }
+          if (!objects.next) {
+            return this.$(".more").hide();
+          }
+        })
+      });
     }
   };
 

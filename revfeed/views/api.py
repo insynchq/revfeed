@@ -40,9 +40,9 @@ def _commit_to_dict(commit):
             'id': commit.author.email,
             'email': commit.author.email,
             'name': commit.author.name,
+            'avatar': _gravatar(commit.author.email),
         },
         'message': commit.message,
-        'avatar': _gravatar(commit.author.email),
         'time': (commit.author.time + (commit.author.offset * 60)) * 1000,
     }
 
@@ -62,9 +62,9 @@ def _repo_to_dict(repo, start=None, count=10):
     else:
         next = None
     return {
-        'id': repo.path,
-        'path': repo.path,
+        'id': name,
         'name': name,
+        'path': repo.path,
         'commits': commits,
         'start': start,
         'next': next,
