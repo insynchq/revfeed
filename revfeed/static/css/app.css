@@ -37,7 +37,6 @@ header, #revfeed, footer {
 .commits li img {
     float: left;
     margin-top: 5px;
-    border-radius: 10px;
 }
 
 .commits li .message {
@@ -65,6 +64,8 @@ header, #revfeed, footer {
 }
 
 .more {
+    background-color: #f6f6f6;
+    border-color: #d0d0d0;
     text-align: center;
     font-size: 80%;
     line-height: 20px;
