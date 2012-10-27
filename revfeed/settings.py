@@ -3,11 +3,14 @@ from os import environ
 
 # Defaults
 
+DEBUG = False
+
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
-REDIS_KEY_PREFIX = "revfeed:cache:"
 
 REPO_DIRS = "./.git"
+
+COMMITS_PER_FETCH = 10
 
 
 # Get config from ENV
