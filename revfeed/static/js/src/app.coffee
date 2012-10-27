@@ -1,12 +1,5 @@
 # Models
 
-
-randColor = ->
-    r: Math.floor(Math.random() * 64 + 192)
-    g: Math.floor(Math.random() * 64 + 192)
-    b: Math.floor(Math.random() * 64 + 192)
-
-
 class Commit extends Spine.Model
     @configure "Commit", "author_avatar", "author_name", "author_email", "message", "time", "repo_name"
     # @belongsTo "repo", "Repo"
@@ -40,8 +33,19 @@ class Revfeed extends Spine.Controller
     getLabelColor: (repoName) ->
         color = @labelColors?[repoName]
         unless color
+            [r, g, b] = [0, 0, 0]
             @labelColors = @labelColors or {}
-            color = @labelColors[repoName] = randColor()
+            repoName.split("").map((c, i) ->
+                charCode = c.charCodeAt(0)
+                unless i % 1
+                    r += charCode
+                unless i % 3
+                    g += charCode
+                unless i % 5
+                    b += charCode
+                )
+            [r, g, b] = ((Math.floor((c % 256) * 0.5) + 128) for c in [r, g, b])
+            color = @labelColors[repoName] = r: r, g: g, b: b
         color
     addOne: (commit) =>
         commitItem = new CommitItem(item: commit)
