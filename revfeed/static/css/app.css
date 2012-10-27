@@ -8,7 +8,14 @@ a {
     color: #333;
 }
 
-header, #revfeed, footer {
+h1 {
+    background-color: #333;
+    color: white;
+    margin: 0 0 20px 0;
+    padding: 0 5%;
+}
+
+#revfeed, footer {
     margin: 0 auto;
     width: 90%;
 }
