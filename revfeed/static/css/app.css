@@ -38,7 +38,7 @@ h1 {
     border-bottom: 1px silver solid;
     background-color: #eee;
     text-shadow: 1px 1px 0 white;
-    line-height: 30px;
+    line-height: 1;
 }
 
 .commits li img {
@@ -49,10 +49,12 @@ h1 {
 .commits li .message {
     margin: 7px 0 7px 30px;
     padding: 0;
-    line-height: 15px;
+    white-space: pre-wrap;
+    line-height: 1;
 }
 
 .commits li .metadata {
+    line-height: 2.5;
     float: right;
     font-size: 80%;
 }
