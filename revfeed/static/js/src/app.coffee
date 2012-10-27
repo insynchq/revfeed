@@ -1,7 +1,8 @@
 # Models
 
 class Commit extends Spine.Model
-    @configure "Commit", "author_avatar", "author_name", "author_email", "message", "time", "repo_name"
+    @configure "Commit", "author_avatar", "author_name", "author_email",
+        "message", "time", "repo_name", "new"
     # @belongsTo "repo", "Repo"
     @extend Spine.Model.Ajax
     formattedTime: =>
@@ -22,12 +23,15 @@ class Revfeed extends Spine.Controller
     elements:
         ".commits": "$commits"
         ".more": "$more"
+        ".new-commits": "$newCommits"
     events:
-        "click .more a": "more"
+        "click .more a": "moreCommits"
+        "click .new-commits a": "showNewCommits"
+    newCommits: 0
     constructor: ->
         super
-        RevfeedCommit.bind("refresh", @addAll)
-        RevfeedCommit.bind("create", @addOne)
+        RevfeedCommit.bind("create", @addCommit)
+        RevfeedCommit.bind("refresh", @initCommits)
         RevfeedCommit.fetch()
         return
     getLabelColor: (repoName) ->
@@ -47,7 +51,7 @@ class Revfeed extends Spine.Controller
             [r, g, b] = ((Math.floor((c % 256) * 0.5) + 128) for c in [r, g, b])
             color = @labelColors[repoName] = r: r, g: g, b: b
         color
-    addOne: (commit) =>
+    addCommit: (commit) =>
         commitItem = new CommitItem(item: commit)
         $commit = commitItem.render().el
         labelColor = @getLabelColor(commit.repo_name)
@@ -55,13 +59,22 @@ class Revfeed extends Spine.Controller
             "background-color",
             "rgb(#{labelColor.r}, #{labelColor.g}, #{labelColor.b})"
             )
-        @$commits.append($commit)
+        if commit.new
+            # Update new commits
+            @newCommits++
+            @$newCommits
+                .html(Templates.newCommits(new_commits: @newCommits))
+                .show()
+            # Prepend new commit
+            @$commits.prepend($commit.addClass("new"))
+        else
+            @$commits.append($commit)
         return
-    addAll: =>
+    initCommits: =>
         @$commits.empty()
-        RevfeedCommit.each(@addOne)
+        RevfeedCommit.each(@addCommit)
         return
-    more: (e) =>
+    moreCommits: (e) =>
         e.preventDefault()
         RevfeedCommit.fetch(
             url: RevfeedCommit.nextURL
@@ -70,6 +83,12 @@ class Revfeed extends Spine.Controller
                     @$more.hide()
             )
         return
+    showNewCommits: (e) =>
+        e.preventDefault()
+        @newCommits = 0
+        @$newCommits.hide()
+        @$(".new", @$commits).removeClass("new")
+
 
 class CommitItem extends Spine.Controller
     tag: "li"
@@ -79,10 +98,27 @@ class CommitItem extends Spine.Controller
         @
 
 
+# Templates
+
 Templates = {}
 
 
 $ ->
     Mustache.tags = ["<%", "%>"]
     Templates.commit = Mustache.compile($("#commit-template").remove().html())
+    Templates.newCommits = Mustache.compile($("#new-commits-template").remove().html())
     new Revfeed(el: $("#revfeed"))
+
+
+# Socket.IO
+
+WEB_SOCKET_SWF_LOCATION = "/static/WebSocketMain.swf"
+
+notifier = io.connect("/notifier")
+
+notifier.on("revfeed", (commits) ->
+    for commit in commits
+        commit.new = true
+        RevfeedCommit.create(commit, ajax: false)
+    return
+    )

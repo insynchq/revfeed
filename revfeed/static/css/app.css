@@ -9,10 +9,10 @@ a {
 }
 
 h1 {
-    background-color: #333;
-    color: white;
     margin: 0 0 20px 0;
     padding: 0 5%;
+    background-color: #333;
+    color: white;
 }
 
 #revfeed, footer {
@@ -32,30 +32,37 @@ h1 {
 }
 
 .commits li,
-.more {
+.action {
     overflow: hidden;
     padding: 0 5px;
     border-bottom: 1px silver solid;
     background-color: #eee;
     text-shadow: 1px 1px 0 white;
-    line-height: 1;
+}
+
+.commits li {
+    transition: background-color 0.5s;
+}
+
+.commits .new {
+    display: none;
 }
 
 .commits li img {
     float: left;
-    margin-top: 5px;
+    margin-top: 6px;
 }
 
 .commits li .message {
-    margin: 7px 0 7px 30px;
+    margin: 8px 0 8px 30px;
     padding: 0;
     white-space: pre-wrap;
     line-height: 1;
 }
 
 .commits li .metadata {
-    line-height: 2.5;
     float: right;
+    margin-top: 6px;
     font-size: 80%;
 }
 
@@ -64,22 +71,26 @@ h1 {
 }
 
 .commits li .metadata .repo-name {
-    background-color: silver;
     display: inline-block;
-    line-height: 1.25;
     padding: 0 5px;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
     border-radius: 3px;
+    background-color: silver;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+    line-height: 1.25;
 }
 
-.more {
-    background-color: #f6f6f6;
+.action {
     border-color: #d0d0d0;
+    background-color: #f6f6f6;
     text-align: center;
     font-size: 80%;
-    line-height: 20px;
+    line-height: 2;
 }
 
-.commits .more a {
+.action a {
     color: gray;
+}
+
+.new-commits {
+    display: none;
 }

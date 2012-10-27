@@ -50,6 +50,8 @@ def _commit_to_dict(commit):
 
 
 def update(db):
+    commits = {}
+
     for repo in _get_repos().values():
         repo_name = _get_repo_name(repo)
 
@@ -83,4 +85,9 @@ def update(db):
 
             logger.info("%s: %s", commit['hex'][:8], commit['message'].strip())
 
+            # Add to return value
+            commits.setdefault(repo_name, []).append(commit)
+
         db.set('revfeed:%s:head' % repo_name, repo.head.hex)
+
+    return commits

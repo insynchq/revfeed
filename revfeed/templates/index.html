@@ -17,8 +17,10 @@
         <h1>Revfeed</h1>
     </header>
     <div id="revfeed">
-        <ul class="commits"></ul>
-        <div class="more"><a href="#">More&hellip;</a></div>
+        <div class="action new-commits"></div>
+        <ul class="commits">
+        </ul>
+        <div class="action more"><a href="#">More&hellip;</a></div>
     </div>
     <footer>
         <p>
@@ -34,6 +36,9 @@
             <time><% formattedTime %></time>
         </div>
         <p class="message"><% message %></p>
+    </script>
+    <script id="new-commits-template" type="text/html">
+        <a href="#"><% new_commits %> new commits</a>
     </script>
 </body>
 </html>

@@ -16,7 +16,9 @@ db = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
 def update_db():
     from revfeed import feeds
     logger.info("Updating DB...\n")
-    feeds.git.update(db)
+    commits = {}
+    commits.update(feeds.git.update(db))
+    return commits
 
 
 def create_app():
@@ -25,4 +27,5 @@ def create_app():
     app.config.from_object(settings)
     app.register_blueprint(views.api)
     app.register_blueprint(views.pages)
+    app.register_blueprint(views.ws)
     return app
