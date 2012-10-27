@@ -1,7 +1,14 @@
 # Models
 
+
+randColor = ->
+    r: Math.floor(Math.random() * 64 + 192)
+    g: Math.floor(Math.random() * 64 + 192)
+    b: Math.floor(Math.random() * 64 + 192)
+
+
 class Commit extends Spine.Model
-    @configure "Commit", "author_avatar", "author_name", "author_email", "message", "time"
+    @configure "Commit", "author_avatar", "author_name", "author_email", "message", "time", "repo_name"
     # @belongsTo "repo", "Repo"
     @extend Spine.Model.Ajax
     formattedTime: =>
@@ -30,9 +37,21 @@ class Revfeed extends Spine.Controller
         RevfeedCommit.bind("create", @addOne)
         RevfeedCommit.fetch()
         return
+    getLabelColor: (repoName) ->
+        color = @labelColors?[repoName]
+        unless color
+            @labelColors = @labelColors or {}
+            color = @labelColors[repoName] = randColor()
+        color
     addOne: (commit) =>
-        commit = new CommitItem(item: commit)
-        @$commits.append(commit.render().el)
+        commitItem = new CommitItem(item: commit)
+        $commit = commitItem.render().el
+        labelColor = @getLabelColor(commit.repo_name)
+        $(".repo-name", $commit).css(
+            "background-color",
+            "rgb(#{labelColor.r}, #{labelColor.g}, #{labelColor.b})"
+            )
+        @$commits.append($commit)
         return
     addAll: =>
         @$commits.empty()
