@@ -18,22 +18,14 @@ header, #revfeed, footer {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
-.repo {
-    margin-bottom: 10px;
-}
-
-.repo h2 {
-    margin: 0;
-}
-
-.repo .commits {
+.commits {
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.repo .commits li,
-.repo .more {
+.commits li,
+.more {
     overflow: hidden;
     padding: 0 5px;
     border-bottom: 1px silver solid;
@@ -42,30 +34,42 @@ header, #revfeed, footer {
     line-height: 30px;
 }
 
-.repo .commits li img {
+.commits li img {
     float: left;
     margin-top: 5px;
     border-radius: 10px;
 }
 
-.repo .commits li .message {
+.commits li .message {
     margin: 7px 0 7px 30px;
     padding: 0;
     line-height: 15px;
 }
 
-.repo .commits li time {
+.commits li .metadata {
     float: right;
-    color: #595959;
     font-size: 80%;
 }
 
-.repo .more {
+.commits li .metadata time {
+    color: #595959;
+}
+
+.commits li .metadata .repo-name {
+    background-color: silver;
+    display: inline-block;
+    line-height: 1.25;
+    padding: 0 5px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+    border-radius: 3px;
+}
+
+.more {
     text-align: center;
     font-size: 80%;
     line-height: 20px;
 }
 
-.repo .commits .more a {
+.commits .more a {
     color: gray;
 }

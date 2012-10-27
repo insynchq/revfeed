@@ -1,78 +1,54 @@
 # Models
 
 class Commit extends Spine.Model
-    @configure "Commit", "author", "message", "time"
-    @belongsTo "repo", "Repo"
-    formattedTime: =>
-        moment.utc(@time).calendar()
-
-class Repo extends Spine.Model
-    @configure "Repo", "name", "path", "commits", "start", "next"
-    @hasMany "commits", "Commit"
+    @configure "Commit", "author_avatar", "author_name", "author_email", "message", "time"
+    # @belongsTo "repo", "Repo"
     @extend Spine.Model.Ajax
+    formattedTime: =>
+        moment.utc(@time * 1000).calendar()
+
+class RevfeedCommit extends Commit
     @extend
-        url: "/api/repos"
+        url: "/api/revfeed"
         fromJSON: (objects) ->
-            unless objects
-                return
-            if objects?.repos
-                new Repo(repo) for repo in objects.repos
-            else
-                new Repo(objects)
-    constructor: (objects) ->
-        super
-        @commits().create(commit) for commit in objects.commits
+            return unless objects
+            @nextURL = objects.next_url
+            new RevfeedCommit(commit) for commit in objects.commits
 
 
 # Controllers
 
 class Revfeed extends Spine.Controller
-    constructor: ->
-        super
-        Repo.bind("create", @addRepo)
-        Repo.bind("refresh", @addRepos)
-        Repo.fetch()
-    addRepo: (repo) =>
-        view = new Repos(item: repo)
-        @el.append(view.render().el)
-    addRepos: =>
-        @el.empty() # Remove loading text
-        Repo.each(@addRepo)
-
-class Repos extends Spine.Controller
-    tag: "div"
-    className: "repo"
-    events:
-        "click .more a": "more"
     elements:
         ".commits": "$commits"
         ".more": "$more"
-    render: =>
-        @html(Templates.repo(@item))
-        @addCommits(@item.commits().all())
-        unless @item.next
-            @$(".more").hide();
-        @
-    addCommit: (commit) =>
-        view = new Commits(item: commit)
-        @$commits.append(view.render().el)
-    addCommits: (commits) =>
-        commits.map(@addCommit)
+    events:
+        "click .more a": "more"
+    constructor: ->
+        super
+        RevfeedCommit.bind("refresh", @addAll)
+        RevfeedCommit.bind("create", @addOne)
+        RevfeedCommit.fetch()
+        return
+    addOne: (commit) =>
+        commit = new CommitItem(item: commit)
+        @$commits.append(commit.render().el)
+        return
+    addAll: =>
+        @$commits.empty()
+        RevfeedCommit.each(@addOne)
+        return
     more: (e) =>
         e.preventDefault()
-        if @item.next
-            @item.ajax().reload
-                url: @item.next
-                success: @proxy((objects) ->
-                    for commit in objects.commits
-                        @item.commits().create(commit)
-                        @addCommit(@item.commits().last())
-                    unless objects.next
-                        @$(".more").hide()
-                    )
+        RevfeedCommit.fetch(
+            url: RevfeedCommit.nextURL
+            success: @proxy (objects) ->
+                unless objects.next_url
+                    @$more.hide()
+            )
         return
 
-class Commits extends Spine.Controller
+class CommitItem extends Spine.Controller
     tag: "li"
     className: "commit"
     render: =>
@@ -85,6 +61,5 @@ Templates = {}
 
 $ ->
     Mustache.tags = ["<%", "%>"]
-    Templates.repo = Mustache.compile($("#repo-template").remove().html())
     Templates.commit = Mustache.compile($("#commit-template").remove().html())
     new Revfeed(el: $("#revfeed"))
