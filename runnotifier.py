@@ -49,6 +49,8 @@ if __name__ == '__main__':
 
     logger.info("Started notifier")
 
+    update_db()
+
     try:
         while True:
             time.sleep(1)
