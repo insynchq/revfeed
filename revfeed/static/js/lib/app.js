@@ -61,12 +61,12 @@ Revfeed = (function(_super) {
 
   Revfeed.prototype.elements = {
     ".commits": "$commits",
-    ".more": "$more",
+    ".older": "$older",
     ".new-commits": "$newCommits"
   };
 
   Revfeed.prototype.events = {
-    "click .more a": "moreCommits",
+    "click .older a": "olderCommits",
     "click .new-commits a": "showNewCommits"
   };
 
@@ -75,14 +75,14 @@ Revfeed = (function(_super) {
   function Revfeed() {
     this.showNewCommits = __bind(this.showNewCommits, this);
 
-    this.moreCommits = __bind(this.moreCommits, this);
+    this.olderCommits = __bind(this.olderCommits, this);
 
-    this.initCommits = __bind(this.initCommits, this);
+    this.addCommits = __bind(this.addCommits, this);
 
     this.addCommit = __bind(this.addCommit, this);
     Revfeed.__super__.constructor.apply(this, arguments);
     RevfeedCommit.bind("create", this.addCommit);
-    RevfeedCommit.bind("refresh", this.initCommits);
+    RevfeedCommit.bind("refresh", this.addCommits);
     RevfeedCommit.fetch();
     return;
   }
@@ -144,18 +144,17 @@ Revfeed = (function(_super) {
     }
   };
 
-  Revfeed.prototype.initCommits = function() {
-    this.$commits.empty();
-    RevfeedCommit.each(this.addCommit);
+  Revfeed.prototype.addCommits = function(commits) {
+    commits.forEach(this.addCommit);
   };
 
-  Revfeed.prototype.moreCommits = function(e) {
+  Revfeed.prototype.olderCommits = function(e) {
     e.preventDefault();
     RevfeedCommit.fetch({
       url: RevfeedCommit.nextURL,
       success: this.proxy(function(objects) {
         if (!objects.next_url) {
-          return this.$more.hide();
+          return this.$older.hide();
         }
       })
     });

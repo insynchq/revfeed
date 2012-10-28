@@ -3,7 +3,6 @@
 class Commit extends Spine.Model
     @configure "Commit", "author_avatar", "author_name", "author_email",
         "message", "time", "repo_name", "new"
-    # @belongsTo "repo", "Repo"
     @extend Spine.Model.Ajax
     formattedTime: =>
         moment.utc(@time * 1000).calendar()
@@ -22,16 +21,16 @@ class RevfeedCommit extends Commit
 class Revfeed extends Spine.Controller
     elements:
         ".commits": "$commits"
-        ".more": "$more"
+        ".older": "$older"
         ".new-commits": "$newCommits"
     events:
-        "click .more a": "moreCommits"
+        "click .older a": "olderCommits"
         "click .new-commits a": "showNewCommits"
     newCommits: 0
     constructor: ->
         super
         RevfeedCommit.bind("create", @addCommit)
-        RevfeedCommit.bind("refresh", @initCommits)
+        RevfeedCommit.bind("refresh", @addCommits)
         RevfeedCommit.fetch()
         return
     getLabelColor: (repoName) ->
@@ -70,17 +69,16 @@ class Revfeed extends Spine.Controller
         else
             @$commits.append($commit)
         return
-    initCommits: =>
-        @$commits.empty()
-        RevfeedCommit.each(@addCommit)
+    addCommits: (commits) =>
+        commits.forEach(@addCommit)
         return
-    moreCommits: (e) =>
+    olderCommits: (e) =>
         e.preventDefault()
         RevfeedCommit.fetch(
             url: RevfeedCommit.nextURL
             success: @proxy (objects) ->
                 unless objects.next_url
-                    @$more.hide()
+                    @$older.hide()
             )
         return
     showNewCommits: (e) =>
