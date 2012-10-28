@@ -112,7 +112,7 @@ Revfeed = (function(_super) {
         _results = [];
         for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
           c = _ref2[_i];
-          _results.push(Math.floor((c % 256) * 0.5) + 128);
+          _results.push(Math.floor((c % 256) * 0.25) + 192);
         }
         return _results;
       })(), r = _ref2[0], g = _ref2[1], b = _ref2[2];

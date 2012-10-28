@@ -47,7 +47,7 @@ class Revfeed extends Spine.Controller
                 unless i % 5
                     b += charCode
                 )
-            [r, g, b] = ((Math.floor((c % 256) * 0.5) + 128) for c in [r, g, b])
+            [r, g, b] = ((Math.floor((c % 256) * 0.25) + 192) for c in [r, g, b])
             color = @labelColors[repoName] = r: r, g: g, b: b
         color
     addCommit: (commit) =>
