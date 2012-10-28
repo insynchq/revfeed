@@ -57,7 +57,7 @@ def _commit_to_dict(commit):
         'author_name': author_name,
         'author_avatar': gravatar(author_email),
         'message': message,
-        'time': int(sum(timestamp_tuple)),
+        'time': int(timestamp_tuple[0] - timestamp_tuple[1]),
     }
 
 
