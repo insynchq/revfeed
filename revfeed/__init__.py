@@ -18,6 +18,7 @@ def update_db():
     logger.info("Updating DB...\n")
     commits = {}
     commits.update(feeds.git.update(db))
+    commits.update(feeds.hg.update(db))
     return commits
 
 

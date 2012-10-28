@@ -1,22 +1,23 @@
 import os.path
+import re
 
-from pygit2 import Repository, GIT_SORT_TIME
+from mercurial import hg, ui
 
 from revfeed import settings, logger
 from revfeed.feeds.utils import gravatar
 
 
 def _get_repo_name(repo):
-    return os.path.split(os.path.dirname(os.path.dirname(repo.path)))[1] + \
-           '.git'
+    return os.path.basename(repo.root) + '.hg'
 
 
 def _get_repos():
     if not getattr(_get_repos, 'repos', False):
         _get_repos.repos = {}
-        for repo_dir in filter(lambda d: d.endswith('.git'),
-                               settings.REPO_DIRS):
-            repo = Repository(repo_dir)
+        _ui = ui.ui()
+        is_hg = lambda d: os.path.exists(os.path.join(d, '.hg'))
+        for repo_dir in filter(is_hg, settings.REPO_DIRS):
+            repo = hg.repository(_ui, repo_dir)
             name = _get_repo_name(repo)
             if _get_repos.repos.get(name):
                 raise KeyError("Duplicate repo name")
@@ -25,18 +26,38 @@ def _get_repos():
 
 
 def _get_commits(repo):
-    for commit in repo.walk(repo.head.hex, GIT_SORT_TIME):
-        yield commit
+    for i in reversed(xrange(len(repo))):
+        commit = repo[i]
+        if commit.hex() == '0000000000000000000000000000000000000000':
+            break
+        else:
+            yield commit
+
+
+USERNAME_PAT = re.compile("([^<]+)<([^>]+)>")
+EMAIL_PAT = re.compile(".+@.+\..+")
 
 
 def _commit_to_dict(commit):
+    changeid, username, timestamp_tuple, files_changed, message, extra = \
+        commit.changeset()
+    match = USERNAME_PAT.search(username)
+    if match:
+        author_name, author_email = match.groups()
+    else:
+        if EMAIL_PAT.match(username):
+            author_email = username
+            author_name = None
+        else:
+            author_name = username
+            author_email = None
     return {
-        'hex': commit.hex,
-        'author_email': commit.author.email,
-        'author_name': commit.author.name,
-        'author_avatar': gravatar(commit.author.email),
-        'message': commit.message,
-        'time': commit.author.time + (commit.author.offset * 60),
+        'hex': commit.hex(),
+        'author_email': author_email,
+        'author_name': author_name,
+        'author_avatar': gravatar(author_email),
+        'message': message,
+        'time': int(sum(timestamp_tuple)),
     }
 
 
@@ -79,6 +100,6 @@ def update(db):
             # Add to return value
             commits.setdefault(repo_name, []).append(commit)
 
-        db.set('revfeed:%s:head' % repo_name, repo.head.hex)
+        db.set('revfeed:%s:head' % repo_name, repo[repo.changelog.tip()].hex())
 
     return commits
