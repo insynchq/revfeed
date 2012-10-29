@@ -30,16 +30,13 @@ class NotifierNamespace(BaseNamespace, BroadcastMixin):
 
     def notifier_listen(self):
         while True:
-            if self.notifier_stopped.is_set():
-                return
             event, data = notifier_queue.get()
             self.broadcast_event(event, data)
             gevent.sleep()
 
-    def recv_disconnect(self):
-        self.notifier_stopped.set()
-        self.notifier_greenlet.join()
-        self.disconnect(silent=True)
+    def disconnect(self, *args, **kwargs):
+        self.notifier_greenlet.kill()
+        super(NotifierNamespace, self).disconnect(*args, **kwargs)
 
 
 @ws.route('/')
