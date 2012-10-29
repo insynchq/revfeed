@@ -54,7 +54,7 @@ h1 {
 }
 
 .commits li .message {
-    margin: 8px 0 8px 30px;
+    margin: 8px 0 8px 25px;
     padding: 0;
     white-space: pre-wrap;
     line-height: 1;
@@ -62,8 +62,14 @@ h1 {
 
 .commits li .metadata {
     float: right;
-    margin-top: 6px;
+    margin: 6px 0;
     font-size: 80%;
+}
+
+@media only screen and (max-width: 479px) {
+    .commits li {
+        font-size: 80%;
+    }
 }
 
 .commits li .metadata time {
