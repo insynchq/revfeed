@@ -27,4 +27,6 @@ for key in _locals.keys():
             _locals[key] = value
 
 
+WEB_PORT = int(WEB_PORT)
+REDIS_PORT = int(REDIS_PORT)
 REPO_DIRS = REPO_DIRS.split(',')
