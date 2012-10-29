@@ -7,8 +7,7 @@ from revfeed.feeds.utils import gravatar
 
 
 def _get_repo_name(repo):
-    return os.path.split(os.path.dirname(os.path.dirname(repo.path)))[1] + \
-           '.git'
+    return os.path.split(os.path.dirname(os.path.dirname(repo.path)))[1]
 
 
 def _get_repos():

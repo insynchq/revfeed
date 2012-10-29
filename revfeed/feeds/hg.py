@@ -8,7 +8,7 @@ from revfeed.feeds.utils import gravatar
 
 
 def _get_repo_name(repo):
-    return os.path.basename(repo.root) + '.hg'
+    return os.path.basename(repo.root)
 
 
 def _get_repos():
