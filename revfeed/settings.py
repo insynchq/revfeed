@@ -5,6 +5,9 @@ from os import environ
 
 DEBUG = False
 
+WEB_HOST = "localhost"
+WEB_PORT = 5000
+
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 

@@ -3,13 +3,15 @@ monkey.patch_all()
 
 from socketio.server import SocketIOServer
 
-from revfeed import create_app, logger
+from revfeed import create_app, logger, settings
 
 
 if __name__ == '__main__':
     app = create_app()
-    logger.info("Started server")
     try:
-        SocketIOServer(('', 5000), app, resource='socket.io').serve_forever()
+        bind = (settings.WEB_HOST, settings.WEB_PORT)
+        logger.info("Started server (%s:%d)", *bind)
+        server = SocketIOServer(bind, app, resource='socket.io')
+        server.serve_forever()
     except KeyboardInterrupt:
         pass
