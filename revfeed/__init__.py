@@ -14,12 +14,9 @@ db = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
 
 
 def update_db():
-    from revfeed import feeds
     logger.info("Updating DB...\n")
-    commits = {}
-    commits.update(feeds.git.update(db))
-    commits.update(feeds.hg.update(db))
-    return commits
+    from revfeed import repos
+    return repos.update(db)
 
 
 def create_app():
