@@ -9,7 +9,7 @@ class Commit extends Spine.Model
 
 class RevfeedCommit extends Commit
     @extend
-        url: "/api/revfeed"
+        url: "api/revfeed"
         fromJSON: (objects) ->
             return unless objects
             @nextURL = objects.next_url

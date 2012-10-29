@@ -34,7 +34,7 @@ RevfeedCommit = (function(_super) {
   }
 
   RevfeedCommit.extend({
-    url: "/api/revfeed",
+    url: "api/revfeed",
     fromJSON: function(objects) {
       var commit, _i, _len, _ref, _results;
       if (!objects) {
