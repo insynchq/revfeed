@@ -9,4 +9,7 @@ from revfeed import create_app, logger
 if __name__ == '__main__':
     app = create_app()
     logger.info("Started server")
-    SocketIOServer(('', 5000), app, resource='socket.io').serve_forever()
+    try:
+        SocketIOServer(('', 5000), app, resource='socket.io').serve_forever()
+    except KeyboardInterrupt:
+        pass

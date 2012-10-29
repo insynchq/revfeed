@@ -9,26 +9,36 @@ from revfeed import db
 
 
 ws = Blueprint('ws', __name__, url_prefix='/socket.io')
+notifier_queue = gevent.queue.Queue(None)  # FIXME: Replace with a channel
+
+
+def start_pubsub():  # FIXME: Not so cool to be in here
+    pubsub = db.pubsub()
+    pubsub.subscribe('notifier')
+    for msg in pubsub.listen():
+        if msg['type'] == 'message':
+            if msg['channel'] == 'notifier':
+                notifier_queue.put(msgpack.unpackb(msg['data']))
+gevent.spawn(start_pubsub)
 
 
 class NotifierNamespace(BaseNamespace, BroadcastMixin):
 
     def initialize(self):
-        self.is_done = gevent.event.Event()
-        self.pubsub = gevent.spawn(self.start_pubsub)
+        self.notifier_stopped = gevent.event.Event()
+        self.notifier_greenlet = gevent.spawn(self.notifier_listen)
 
-    def start_pubsub(self):
-        pubsub = db.pubsub()
-        pubsub.subscribe('notifier')
-        for msg in pubsub.listen():
-            if self.is_done.is_set():
-                break
-            if msg['channel'] == 'notifier' and msg['type'] == 'message':
-                event, data = msgpack.unpackb(msg['data'])
-                self.broadcast_event(event, data)
+    def notifier_listen(self):
+        while True:
+            if self.notifier_stopped.is_set():
+                return
+            event, data = notifier_queue.get()
+            self.broadcast_event(event, data)
+            gevent.sleep()
 
     def recv_disconnect(self):
-        self.is_done.set()
+        self.notifier_stopped.set()
+        self.notifier_greenlet.join()
         self.disconnect(silent=True)
 
 
