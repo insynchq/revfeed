@@ -40,8 +40,7 @@ if __name__ == '__main__':
         elif os.path.exists(os.path.join(repo_dir, '.hg')):
             observer.schedule(revfeed_event_handler,
                               path=os.path.join(repo_dir,
-                                                '.hg/store/00changelog.i'),
-                              recursive=True)
+                                                '.hg/store/00changelog.i'))
 
     observer.start()
 
