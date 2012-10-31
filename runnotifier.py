@@ -11,8 +11,6 @@ from revfeed import settings, db, update_db, logger
 class NotifierHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
-        if os.path.basename(event.src_path) not in ['00changelog.i', 'heads']:
-            return
         commits = update_db()
         if commits:
             # Publish to revfeed
@@ -42,7 +40,7 @@ if __name__ == '__main__':
         elif os.path.exists(os.path.join(repo_dir, '.hg')):
             observer.schedule(revfeed_event_handler,
                               path=os.path.join(repo_dir,
-                                                '.hg/store'),
+                                                '.hg/store/00changelog.i'),
                               recursive=True)
 
     observer.start()
