@@ -112,7 +112,14 @@ $ ->
 
 WEB_SOCKET_SWF_LOCATION = "/static/WebSocketMain.swf"
 
-notifier = io.connect("/notifier")
+path = location.pathname.replace(/^\/+|\/+$/g, '')
+resource = "socket.io"
+if path.length
+    resource = "#{path}/#{resource}"
+notifier = io.connect(
+    "/notifier",
+    resource: resource
+    )
 
 notifier.on("revfeed", (commits) ->
     for commit in commits
