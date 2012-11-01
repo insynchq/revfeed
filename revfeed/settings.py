@@ -11,7 +11,7 @@ WEB_PORT = 5000
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 
-REPO_DIRS = "./.git"
+REPO_DIRS = []
 
 COMMITS_PER_FETCH = 10
 
@@ -29,4 +29,5 @@ for key in _locals.keys():
 
 WEB_PORT = int(WEB_PORT)
 REDIS_PORT = int(REDIS_PORT)
-REPO_DIRS = REPO_DIRS.split(',')
+if isinstance(REPO_DIRS, str):
+    REPO_DIRS = REPO_DIRS.split(',')
