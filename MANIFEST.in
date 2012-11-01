@@ -1,0 +1,2 @@
+recursive-include revfeed/templates *
+recursive-include revfeed/static *
