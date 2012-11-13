@@ -11,7 +11,7 @@ WEB_PORT = 5000
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 
-REPO_DIRS = []
+REPO_DIRS = {}
 
 COMMITS_PER_FETCH = 10
 
@@ -30,4 +30,6 @@ for key in _locals.keys():
 WEB_PORT = int(WEB_PORT)
 REDIS_PORT = int(REDIS_PORT)
 if isinstance(REPO_DIRS, str):
-    REPO_DIRS = REPO_DIRS.split(',')
+    for repo_entry in REPO_DIRS.split(','):
+        repo_name, repo_dir = repo_entry.split('=')
+        REPO_DIRS[repo_name] = repo_dir

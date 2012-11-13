@@ -7,7 +7,6 @@ requirements_path = os.path.join(os.path.dirname("requirements.txt"),
 with open(requirements_path) as f:
     install_requires = f.readlines()
 
-
 setup(
     name='revfeed',
     version='0.0.0',

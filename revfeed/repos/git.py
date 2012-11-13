@@ -1,22 +1,17 @@
 from functools import partial
-import os.path
 
 from pygit2 import Repository, GIT_SORT_TIME
 
 from revfeed.repos.utils import gravatar
 
 
-def get_repo(repo_dir):
+def get_repo(repo_name, repo_dir):
     repo = Repository(repo_dir)
     return {
-        'name': _get_repo_name(repo),
+        'name': repo_name,
         'get_commits': partial(_get_commits, repo),
         'latest_commit': repo.head.hex,
     }
-
-
-def _get_repo_name(repo):
-    return os.path.split(os.path.dirname(os.path.dirname(repo.path)))[1]
 
 
 def _get_commits(repo):

@@ -1,5 +1,4 @@
 from functools import partial
-import os.path
 import re
 
 from mercurial import hg, ui
@@ -9,17 +8,13 @@ from revfeed.repos.utils import gravatar
 _ui = ui.ui()
 
 
-def get_repo(repo_dir):
+def get_repo(repo_name, repo_dir):
     repo = hg.repository(_ui, repo_dir)
     return {
-        'name': _get_repo_name(repo),
+        'name': repo_name,
         'get_commits': partial(_get_commits, repo),
         'latest_commit': repo[repo.changelog.tip()].hex(),
     }
-
-
-def _get_repo_name(repo):
-    return os.path.basename(repo.root)
 
 
 def _get_commits(repo):

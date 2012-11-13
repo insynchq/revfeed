@@ -6,15 +6,12 @@ from revfeed.repos import git, hg
 
 def _get_repos():
     repos = []
-    repo_names = set()
-    for repo_dir in settings.REPO_DIRS:
+    for repo_name, repo_dir in settings.REPO_DIRS.items():
         if repo_dir.endswith('.git'):
             get_repo = git.get_repo
         elif os.path.exists(os.path.join(repo_dir, '.hg')):
             get_repo = hg.get_repo
-        repo = get_repo(repo_dir)
-        if repo['name'] in repo_names:
-            raise KeyError("Duplicate repo name")
+        repo = get_repo(repo_name, repo_dir)
         repos.append(repo)
     return repos
 
