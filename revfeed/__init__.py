@@ -47,12 +47,37 @@ def create_app():
     return app
 
 
+def serve(bind, app, **kw):
+    _resource = kw.pop('resource', 'socket.io')
+
+    transports = kw.pop('transports', None)
+    if transports:
+        transports = [x.strip() for x in transports.split(',')]
+
+    policy_server = kw.pop('policy_server', False)
+    if policy_server in (True, 'True', 'true', 'enable', 'yes', 'on', '1'):
+        policy_server = True
+        policy_listener_host = kw.pop('policy_listener_host', bind[0])
+        policy_listener_port = int(kw.pop('policy_listener_port', 10843))
+        kw['policy_listener'] = (policy_listener_host, policy_listener_port)
+    else:
+        policy_server = False
+
+    server = SocketIOServer(bind,
+                            app,
+                            resource=_resource,
+                            transports=transports,
+                            policy_server=policy_server,
+                            **kw)
+    server.serve_forever()
+
+
 def run_server():
     app = create_app()
     try:
         bind = (settings.WEB_HOST, settings.WEB_PORT)
         logger.info("Started server (%s:%d)", *bind)
-        server = SocketIOServer(bind, app, resource='socket.io')
+        server = serve(bind, app, resource='socket.io', policy_server=True)
         server.serve_forever()
     except KeyboardInterrupt:
         pass
