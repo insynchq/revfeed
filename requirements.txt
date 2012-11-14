@@ -2,6 +2,5 @@ Flask==0.9
 pygit2==0.17.3
 redis==2.6.2
 gevent-socketio==0.3.5-rc2
-watchdog==0.6.0
 msgpack-python==0.2.2
 mercurial==2.4-rc
