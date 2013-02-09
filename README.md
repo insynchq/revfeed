@@ -10,7 +10,7 @@ cd revfeed
 python setup.py develop
 ```
 
-Includes a shell script for pygit2 if you have troubles installing it.
+A shell script for pygit2 is included if you have troubles installing it.
 
 ## Usage
 
@@ -21,7 +21,7 @@ Note that git repos should point to the .git dir (e.g. `/home/marksteve/repos/gi
 `/home/marksteve/repos/gitrepo.git` for bare repos) while mercurial repos should just point to the parent (e.g.
 `/home/marksteve/hgrepo`)
 
-## To remove repos:
+### To remove repos:
 `revfeed rm_repo repo_name`
 
 ### To start web server:
