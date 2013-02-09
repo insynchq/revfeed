@@ -5,7 +5,8 @@ Alpha quality and no documentation :P
 
 ## Install
 ```shell
-mkvirtualenv venv
+mkvirtualenv revfeed
+git clone https://github.com/marksteve/revfeed.git
 cd revfeed
 python setup.py develop/install
 ```
