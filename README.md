@@ -18,6 +18,7 @@ A shell script for pygit2 is included if you have troubles installing it.
 ### To add repos:
 
 `revfeed add_repo repo_name absolute_repo_dir_path`
+
 Note that git repos should point to the .git dir (e.g. `/home/marksteve/repos/gitrepo/.git` or
 `/home/marksteve/repos/gitrepo.git` for bare repos) while mercurial repos should just point to the parent (e.g.
 `/home/marksteve/hgrepo`)
