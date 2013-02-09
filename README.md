@@ -3,11 +3,11 @@
 Version control commits feed. Just a page full of commits. Nothing else. New commits show up as notifs twitter style.
 Alpha quality and no documentation :P
 
-## Install deps and cli script with setup.py:
+## Install
 ```shell
 mkvirtualenv venv
 cd revfeed
-python setup.py develop
+python setup.py develop/install
 ```
 
 A shell script for pygit2 is included if you have troubles installing it.
