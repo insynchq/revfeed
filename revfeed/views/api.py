@@ -1,6 +1,6 @@
 from flask import Blueprint, current_app, request, url_for, jsonify
 
-from revfeed import db
+from revfeed.db import db
 
 
 api = Blueprint('api', __name__, url_prefix='/api')

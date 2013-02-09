@@ -2,26 +2,22 @@ from gevent import monkey
 monkey.patch_all()
 
 import logging
+import os
+import sys
 
 from flask import Flask
 from socketio.server import SocketIOServer
 import msgpack
-import redis
 
-from revfeed import settings
-
-
-logger = logging.getLogger('revfeed')
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG if settings.DEBUG else logging.INFO)
-
-db = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+from revfeed import repos, settings
+from revfeed.db import db
+from revfeed.logger import logger
 
 
 def update_db():
     logger.info("Updating DB...\n")
-    from revfeed import repos
     commits = repos.update(db)
+    # FIXME: Only push notification and but get commits from api
     if commits:
         logger.info("Pushing to notifier...\n")
         # Publish to revfeed
@@ -31,10 +27,7 @@ def update_db():
         revfeed_commits = list(sorted(revfeed_commits,
                                       key=lambda c: c['time']))
         db.publish('notifier', msgpack.packb(['revfeed', revfeed_commits]))
-        # Publish to each repo
-        for repo_name in commits.keys():
-            db.publish('notifier', msgpack.packb([repo_name,
-                                                  commits[repo_name]]))
+        # TODO: Push to per repo
 
 
 def create_app():
@@ -77,7 +70,57 @@ def run_server():
     try:
         bind = (settings.WEB_HOST, settings.WEB_PORT)
         logger.info("Started server (%s:%d)", *bind)
-        server = serve(bind, app, resource='socket.io', policy_server=True)
-        server.serve_forever()
+        serve(bind, app, resource='socket.io', policy_server=True)
     except KeyboardInterrupt:
         pass
+
+
+
+def print_help():
+    logger.info("""
+Usage:
+revfeed command [args]
+
+Commands:
+update_db
+run_server
+add_repo repo_name repo_dir
+rm_repo repo_name
+
+""")
+
+
+def cli():
+    if len(sys.argv) > 1:
+        cmd = sys.argv[1]
+        if cmd == 'update_db':
+            update_db()
+        elif cmd == 'run_server':
+            run_server()
+        elif cmd == 'add_repo':
+            repo_name, repo_dir = sys.argv[2:]
+            repo_type = repos.get_repo_type(repo_dir)
+            if not os.path.exists(repo_dir):
+                logger.info('Repo dir does not exist')
+            elif not repo_type:
+                logger.info('Not a valid repo')
+            else:
+                db.hset('revfeed:repo_dirs', repo_name, repo_dir)
+                logger.info('Added %s (%s)', repo_name, repo_dir)
+        elif cmd == 'rm_repo':
+            repo_name = sys.argv[2]
+            if db.hget('revfeed:repo_dirs', repo_name):
+                # Remove commits from revfeed set
+                for commit_key in db.zrange('revfeed:%s' % repo_name, 0, -1):
+                    db.zrem('revfeed', commit_key)
+                # Remove repo set
+                db.delete('revfeed:%s' % repo_name)
+                # Remove repo latest commit
+                db.delete('revfeed:%s:latest_commit' % repo_name)
+                # Remove from repo dirs
+                db.hdel('revfeed:repo_dirs', repo_name)
+                logger.info('Deleted %s', repo_name)
+            else:
+                logger.info('%s does not exist', repo_name)
+    else:
+        print_help()

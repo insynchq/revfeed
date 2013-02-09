@@ -1,16 +1,29 @@
 import os.path
 
-from revfeed import logger, settings
+from revfeed.logger import logger
 from revfeed.repos import git, hg
 
 
-def _get_repos():
+def get_repo_type(repo_dir):
+    if repo_dir.endswith('.git'):
+        return 'git'
+    elif os.path.exists(os.path.join(repo_dir, '.hg')):
+        return 'hg'
+    else:
+        return False
+
+
+def get_repos(db):
     repos = []
-    for repo_name, repo_dir in settings.REPO_DIRS.items():
-        if repo_dir.endswith('.git'):
+    for repo_name, repo_dir in db.hgetall('revfeed:repo_dirs').iteritems():
+        repo_type = get_repo_type(repo_dir)
+        if repo_type == 'git':
             get_repo = git.get_repo
-        elif os.path.exists(os.path.join(repo_dir, '.hg')):
+        elif repo_type == 'hg':
             get_repo = hg.get_repo
+        else:
+            print 'Skipped %s, %s' % (repo_name, repo_dir)
+            continue
         repo = get_repo(repo_name, repo_dir)
         repos.append(repo)
     return repos
@@ -19,7 +32,7 @@ def _get_repos():
 def update(db):
     commits = {}
 
-    for repo in _get_repos():
+    for repo in get_repos(db):
         logger.info(repo['name'])
         logger.info("=" * len(repo['name']))
 

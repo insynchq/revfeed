@@ -17,8 +17,7 @@ setup(
     install_requires=install_requires,
     entry_points={
         'console_scripts': [
-            'revfeed_update_db=revfeed:update_db',
-            'revfeed_run_server=revfeed:run_server',
+            'revfeed=revfeed:cli',
             ],
         },
     include_package_data=True,
