@@ -21,7 +21,6 @@ h1 {
 }
 
 #revfeed {
-    padding: 10px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
@@ -34,7 +33,7 @@ h1 {
 .commits li,
 .action {
     overflow: hidden;
-    padding: 0 5px;
+    padding: 0 10px;
     border-bottom: 1px silver solid;
     background-color: #eee;
     text-shadow: 1px 1px 0 white;
