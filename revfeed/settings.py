@@ -27,3 +27,4 @@ for key in _locals.keys():
 
 WEB_PORT = int(WEB_PORT)
 REDIS_PORT = int(REDIS_PORT)
+COMMITS_PER_FETCH = int(COMMITS_PER_FETCH)
