@@ -122,5 +122,8 @@ def cli():
                 logger.info('Deleted %s', repo_name)
             else:
                 logger.info('%s does not exist', repo_name)
+        elif cmd == 'ls_repo':
+            for repo_name, repo_dir in db.hgetall('revfeed:repo_dirs').iteritems():
+                logger.info('%s: %s', repo_name, repo_dir)
     else:
         print_help()
