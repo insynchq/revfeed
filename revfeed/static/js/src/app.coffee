@@ -5,7 +5,7 @@ class Commit extends Spine.Model
         "message", "time", "repo_name", "new"
     @extend Spine.Model.Ajax
     formattedTime: =>
-        moment.utc(@time * 1000).calendar()
+        moment.unix(@time).calendar()
 
 class RevfeedCommit extends Commit
     @extend

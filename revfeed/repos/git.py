@@ -26,5 +26,5 @@ def _commit_to_dict(commit):
         'author_name': commit.author.name,
         'author_avatar': gravatar(commit.author.email),
         'message': commit.message,
-        'time': commit.author.time + (commit.author.offset * 60),
+        'time': commit.author.time,
     }

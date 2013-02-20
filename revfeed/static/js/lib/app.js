@@ -18,7 +18,7 @@ Commit = (function(_super) {
   Commit.extend(Spine.Model.Ajax);
 
   Commit.prototype.formattedTime = function() {
-    return moment.utc(this.time * 1000).calendar();
+    return moment.unix(this.time).calendar();
   };
 
   return Commit;
