@@ -46,7 +46,7 @@ def revfeed():
 
 @api.route('/repos/<repo_name>')
 def repos(repo_name):
-    commits, before = _get_commits('revfeed:%s' % repo_name)
+    commits, before = _get_commits('revfeed:{0}'.format(repo_name))
     next_url = url_for('.repos', repo_name=repo_name, before=before) if \
         before else None
     return jsonify({
@@ -57,4 +57,4 @@ def repos(repo_name):
 
 @api.route('/repos/<repo_name>/commits/<commit_sum>')
 def commits(repo_name, commit_sum):
-    return jsonify(db.hgetall('revfeed:%s:%s' % (repo_name, commit_sum)))
+    return jsonify(db.hgetall('revfeed:{0}:{1}'.format(repo_name, commit_sum)))

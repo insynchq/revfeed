@@ -22,7 +22,7 @@ def get_repos(db):
         elif repo_type == 'hg':
             get_repo = hg.get_repo
         else:
-            print 'Skipped %s, %s' % (repo_name, repo_dir)
+            print 'Skipped {0}, {1}'.format(repo_name, repo_dir)
             continue
         repo = get_repo(repo_name, repo_dir)
         repos.append(repo)
@@ -40,13 +40,15 @@ def update(db):
         db.sadd('revfeed:repos', repo['name'])
 
         # Get last latest_commit
-        latest_commit = db.get('revfeed:%s:latest_commit' % repo['name'])
+        latest_commit = db.get(
+            'revfeed:{0}:latest_commit'.format(repo['name'])
+            )
 
         for commit in repo['get_commits']():
             if commit['hex'] == latest_commit:
                 break
 
-            commit_key = 'revfeed:%s:%s' % (repo['name'], commit['hex'])
+            commit_key = 'revfeed:{0}:{1}'.format(repo['name'], commit['hex'])
 
             # Set repo name for reference
             commit['repo_name'] = repo['name']
@@ -55,7 +57,7 @@ def update(db):
             db.hmset(commit_key, commit)
 
             # Add commit to repo set
-            db.zadd('revfeed:%s' % repo['name'], commit['time'],
+            db.zadd('revfeed:{0}'.format(repo['name']), commit['time'],
                     commit_key)
 
             # Add commit to revfeed set
@@ -66,7 +68,7 @@ def update(db):
             # Add to return value
             commits.setdefault(repo['name'], []).append(commit)
 
-        db.set('revfeed:%s:latest_commit' % repo['name'],
+        db.set('revfeed:{0}:latest_commit'.format(repo['name']),
                repo['latest_commit'])
 
     return commits

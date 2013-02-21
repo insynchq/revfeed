@@ -13,6 +13,6 @@ def gravatar(email):
         else:
             email_hash = '00000000000000000000000000000000'
         url = gravatar.cache[email] = (
-            "https://gravatar.com/avatar/%s?size=20" %
-            email_hash)
+            "https://gravatar.com/avatar/{0}?size=20".format(email_hash)
+            )
     return url

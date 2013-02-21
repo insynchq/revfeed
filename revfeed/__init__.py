@@ -111,12 +111,13 @@ def cli():
             repo_name = sys.argv[2]
             if db.hget('revfeed:repo_dirs', repo_name):
                 # Remove commits from revfeed set
-                for commit_key in db.zrange('revfeed:%s' % repo_name, 0, -1):
+                for commit_key in db.zrange('revfeed:{0}'.format(repo_name), 0,
+                                            -1):
                     db.zrem('revfeed', commit_key)
                 # Remove repo set
-                db.delete('revfeed:%s' % repo_name)
+                db.delete('revfeed:{0}'.format(repo_name))
                 # Remove repo latest commit
-                db.delete('revfeed:%s:latest_commit' % repo_name)
+                db.delete('revfeed:{0}:latest_commit'.format(repo_name))
                 # Remove from repo dirs
                 db.hdel('revfeed:repo_dirs', repo_name)
                 logger.info('Deleted %s', repo_name)
