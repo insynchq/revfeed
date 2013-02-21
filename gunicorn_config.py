@@ -1,5 +1,5 @@
-from revfeed import settings
+from revfeed import config 
 
 
-bind = "%s:%d" % (settings.WEB_HOST, settings.WEB_PORT)
+bind = "%s:%d" % (config.WEB_HOST, config.WEB_PORT)
 worker_class = "socketio.sgunicorn.GeventSocketIOWorker"

@@ -9,7 +9,7 @@ from flask import Flask
 from socketio.server import SocketIOServer
 import msgpack
 
-from revfeed import repos, settings
+from revfeed import repos, config 
 from revfeed.db import db
 from revfeed.logger import logger
 
@@ -33,7 +33,7 @@ def update_db():
 def create_app():
     from revfeed import views
     app = Flask(__name__)
-    app.config.from_object(settings)
+    app.config.from_object(config)
     app.register_blueprint(views.api)
     app.register_blueprint(views.pages)
     app.register_blueprint(views.ws)
@@ -68,7 +68,7 @@ def serve(bind, app, **kw):
 def run_server():
     app = create_app()
     try:
-        bind = (settings.WEB_HOST, settings.WEB_PORT)
+        bind = (config.WEB_HOST, config.WEB_PORT)
         logger.info("Started server (%s:%d)", *bind)
         serve(bind, app, resource='socket.io', policy_server=True)
     except KeyboardInterrupt:

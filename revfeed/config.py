@@ -11,7 +11,7 @@ WEB_PORT = 5000
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 
-COMMITS_PER_FETCH = 10
+COMMITS_PER_FETCH = 20
 
 
 # Get config from ENV
