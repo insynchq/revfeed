@@ -1,17 +1,24 @@
 from flask import Blueprint, current_app, request, url_for, jsonify
 
+from revfeed import config
 from revfeed.db import db
 
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
 
-def _get_commits_num():
-    return current_app.config['COMMITS_PER_FETCH']
+def _get_commit(commit_key):
+    commit = db.hgetall(commit_key)
+    repo_dir = (db.hget('revfeed:repo_dirs', commit['repo_name'])
+                .rstrip('/.git'))
+    commit['commit_url'] = (config.COMMIT_URL_PATTERN
+                            .sub(config.COMMIT_URL_REPL, repo_dir)
+                            .format(hex=commit['hex']))
+    return commit
 
 
 def _get_commits(zkey):
-    num = _get_commits_num()
+    num = current_app.config['COMMITS_PER_FETCH']
     before = int(request.args.get('before', 0))
 
     # We fetch the next commit too in order to get the next before value
@@ -24,7 +31,7 @@ def _get_commits(zkey):
         # own for some reason
         commit_keys = db.zrevrange(zkey, 0, num)
 
-    commits = map(db.hgetall, commit_keys)
+    commits = map(_get_commit, commit_keys)
 
     if len(commits) > num and commits[:num]:
         before = commits[-1]['time']

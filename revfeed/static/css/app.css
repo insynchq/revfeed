@@ -59,6 +59,10 @@ h1 {
     line-height: 1;
 }
 
+.commits li .message a {
+    text-decoration: none;
+}
+
 .commits li .metadata {
     float: right;
     margin: 6px 0;
