@@ -31,6 +31,7 @@ def _get_commits(zkey):
                                           num=num + 1)
     elif after:
         commit_keys = db.zrangebyscore(zkey, after + 1, '+inf')
+        commit_keys.reverse()
     else:
         # Note the missing `+ 1`. ZREVRANGE is adding one to the count on its
         # own for some reason
