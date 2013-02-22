@@ -26,6 +26,9 @@ Note that git repos should point to the .git dir (e.g. `/home/marksteve/repos/gi
 ### To remove repos:
 `revfeed rm_repo repo_name`
 
+### To list repos added:
+`revfeed ls_repo`
+
 ### To start web server:
 `revfeed run_server`
 
@@ -35,15 +38,13 @@ Note that git repos should point to the .git dir (e.g. `/home/marksteve/repos/gi
 This command also pushes notifications using websockets. You typically want to run this command this everytime
 you push to a repo using commit hooks.
 
-P.S. I don't know what I was thinking then but notifications are inefficient at the moment. Instead of just notifying
-connected clients about the new commits and pulling from the api, the notifications themselves contain the commit
-information :P I'll try to fix that soon or if you want to take a stab at it, you're more than welcome to do a pull
-request.
+## Commit details
 
+You can link commits to your repo web server if you want to check out more about the commit.
+Just change `COMMIT_URL_PATTERN` and `COMMIT_URL_REPL` (`{hex}` contains the hex id of the commit).
 
 ## TODO
 
 * Repo feed
-* Commit details (diff view and other info)
 
 
