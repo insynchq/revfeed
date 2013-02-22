@@ -14,18 +14,23 @@ def _get_commit(commit_key):
     commit['commit_url'] = (config.COMMIT_URL_PATTERN
                             .sub(config.COMMIT_URL_REPL, repo_dir)
                             .format(hex=commit['hex']))
+    if request.args.get('after'):
+        commit['new'] = True
     return commit
 
 
 def _get_commits(zkey):
     num = current_app.config['COMMITS_PER_FETCH']
     before = int(request.args.get('before', 0))
+    after = int(request.args.get('after', 0))
 
     # We fetch the next commit too in order to get the next before value
 
     if before:
         commit_keys = db.zrevrangebyscore(zkey, before, 0, start=0,
                                           num=num + 1)
+    elif after:
+        commit_keys = db.zrangebyscore(zkey, after + 1, '+inf')
     else:
         # Note the missing `+ 1`. ZREVRANGE is adding one to the count on its
         # own for some reason

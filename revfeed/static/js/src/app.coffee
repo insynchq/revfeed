@@ -7,6 +7,7 @@ class Commit extends Spine.Model
     formattedTime: =>
         moment.unix(@time).calendar()
 
+
 class RevfeedCommit extends Commit
     @extend
         url: "api/revfeed"
@@ -121,9 +122,11 @@ notifier = io.connect(
     resource: resource
     )
 
-notifier.on("revfeed", (commits) ->
-    for commit in commits
-        commit.new = true
-        RevfeedCommit.create(commit, ajax: false)
+notifier.on("revfeed", (message) ->
+    if message == "new_commits"
+        lastCommit = RevfeedCommit.first()
+        RevfeedCommit.fetch(
+            url: "/api/revfeed?after=#{lastCommit.time}"
+            )
     return
     )

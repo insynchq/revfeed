@@ -16,17 +16,9 @@ from revfeed.logger import logger
 
 def update_db():
     logger.info("Updating DB...\n")
-    commits = repos.update(db)
-    # FIXME: Only push notification and but get commits from api
-    if commits:
+    if repos.update(db):
         logger.info("Pushing to notifier...\n")
-        # Publish to revfeed
-        revfeed_commits = [item for sublist in commits.values() for item in
-                           sublist]
-        # Sort by time
-        revfeed_commits = list(sorted(revfeed_commits,
-                                      key=lambda c: c['time']))
-        db.publish('notifier', msgpack.packb(['revfeed', revfeed_commits]))
+        db.publish('revfeed', 'new_commits')
         # TODO: Push to per repo
 
 

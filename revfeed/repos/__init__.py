@@ -30,7 +30,7 @@ def get_repos(db):
 
 
 def update(db):
-    commits = {}
+    updated = False
 
     for repo in get_repos(db):
         logger.info(repo['name'])
@@ -65,10 +65,10 @@ def update(db):
 
             logger.info("%s: %s", commit['hex'][:8], commit['message'].strip())
 
-            # Add to return value
-            commits.setdefault(repo['name'], []).append(commit)
+            if not updated:
+                updated = True
 
         db.set('revfeed:{0}:latest_commit'.format(repo['name']),
                repo['latest_commit'])
 
-    return commits
+    return updated

@@ -218,13 +218,12 @@ notifier = io.connect("/notifier", {
   resource: resource
 });
 
-notifier.on("revfeed", function(commits) {
-  var commit, _i, _len;
-  for (_i = 0, _len = commits.length; _i < _len; _i++) {
-    commit = commits[_i];
-    commit["new"] = true;
-    RevfeedCommit.create(commit, {
-      ajax: false
+notifier.on("revfeed", function(message) {
+  var lastCommit;
+  if (message === "new_commits") {
+    lastCommit = RevfeedCommit.first();
+    RevfeedCommit.fetch({
+      url: "/api/revfeed?after=" + lastCommit.time
     });
   }
 });

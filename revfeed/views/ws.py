@@ -18,12 +18,12 @@ class NotifierNamespace(BaseNamespace, BroadcastMixin):
 
     def notifier_listen(self):
         pubsub = db.pubsub()
-        pubsub.subscribe('notifier')
+        pubsub.subscribe('revfeed')
         for msg in pubsub.listen():
-            if msg['type'] == 'message' and msg['channel'] == 'notifier':
-                event, data = msgpack.unpackb(msg['data'])
-                self.broadcast_event(event, data)
-                gevent.sleep()
+            if msg['type'] == 'message' and msg['channel'] == 'revfeed':
+                if msg['data'] == 'new_commits':
+                    self.broadcast_event('revfeed', 'new_commits')
+            gevent.sleep()
 
     def disconnect(self, *args, **kwargs):
         self.notifier_greenlet.kill()
