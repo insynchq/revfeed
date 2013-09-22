@@ -1,0 +1,2 @@
+recursive-include revfeed/static *
+include revfeed/index.html
