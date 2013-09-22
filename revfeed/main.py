@@ -38,7 +38,6 @@ def main():
   # Setup app
   notifier = SockJSRouter(NotifierConnection, '/notifier')
   static_path = pkg_resources.resource_filename(__package__, 'static')
-  print static_path
   app = web.Application(
     [
       (r'/', IndexHandler),
