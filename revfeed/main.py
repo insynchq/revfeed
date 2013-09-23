@@ -77,17 +77,17 @@ def log_request(rh):
 
 def main():
   # Parse args
-  parser = argparse.ArgumentParser(description="Dead simple commits feed.")
+  parser = argparse.ArgumentParser(description="dead simple commits feed")
   parser.add_argument('-s', '--secret', type=str, required=True,
-                      help="Auth secret")
+                      help="auth secret")
   parser.add_argument('-p', '--port', type=int, default=5000,
-                      help="Port to listen")
+                      help="port to listen")
   parser.add_argument('--redis-prefix', type=str, default='revfeed',
-                      help="Redis prefix")
+                      help="redis prefix")
   parser.add_argument('--redis-host', type=str, default='localhost',
-                      help="Redis host")
+                      help="redis host")
   parser.add_argument('--redis-port', type=int, default=6379,
-                      help="Redis port")
+                      help="redis port")
   args = parser.parse_args()
 
   # Setup redis connection
@@ -114,7 +114,7 @@ def main():
   )
 
   app.listen(args.port)
-  print "\n  Revfeed\n"
+  print "\n  revfeed\n"
   print "  * listening to {}".format(args.port)
 
   # Start IOLoop
