@@ -1,4 +1,5 @@
 from time import time
+import argparse
 import pkg_resources
 try:
   import json
@@ -74,30 +75,30 @@ def log_request(rh):
   )
 
 
-def startserver(ui, repo, **kwargs):
-  """
-  start revfeed server
-  """
-
-  # Fix imports
-  from mercurial import demandimport
-  demandimport.ignore.extend([
-    'select',
-    'hiredis',
-  ])
+def main():
+  # Parse args
+  parser = argparse.ArgumentParser(description="Dead simple commits feed.")
+  parser.add_argument('-s', '--secret', type=str, required=True,
+                      help="Auth secret")
+  parser.add_argument('-p', '--port', type=int, default=5000,
+                      help="Port to listen")
+  parser.add_argument('--redis-prefix', type=str, default='revfeed',
+                      help="Redis prefix")
+  parser.add_argument('--redis-host', type=str, default='localhost',
+                      help="Redis host")
+  parser.add_argument('--redis-port', type=int, default=6379,
+                      help="Redis port")
+  args = parser.parse_args()
 
   # Setup redis connection
-  redis_prefix = kwargs.get('redis_prefix')
-  redis_conn = redis.StrictRedis(
-    kwargs.get('redis_host'),
-    kwargs.get('redis_port'),
-  )
+  redis_prefix = args.redis_prefix
+  redis_conn = redis.StrictRedis(args.redis_host, args.redis_port)
 
   # Setup handlers
   handlers = []
   handlers.append((r'/', IndexHandler))
   handlers.append((r'/commits', CommitsHandler, dict(
-    secret=ui.config('revfeed', 'secret'),
+    secret=args.secret,
     redis_prefix=redis_prefix,
     redis_conn=redis_conn,
   )))
@@ -112,10 +113,9 @@ def startserver(ui, repo, **kwargs):
     log_function=log_request,
   )
 
-  port = kwargs.get('port')
-  app.listen(port)
+  app.listen(args.port)
   print "\n  Revfeed\n"
-  print "  * listening to {}".format(port)
+  print "  * listening to {}".format(args.port)
 
   # Start IOLoop
   try:
