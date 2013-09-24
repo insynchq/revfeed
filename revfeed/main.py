@@ -1,3 +1,5 @@
+from base64 import b64encode
+from os import urandom
 from time import time
 import argparse
 import pkg_resources
@@ -25,7 +27,7 @@ class CommitsHandler(web.RequestHandler):
     super(CommitsHandler, self).__init__(*args, **kwargs)
 
   def redis_key(self, *args):
-    return ':'.join([self.redis_prefix] + list(args))
+    return redis_key(self.redis_prefix, *args)
 
   def post(self):
     # Check auth header
@@ -68,31 +70,50 @@ class NotifierConnection(SockJSConnection):
 
 
 def log_request(rh):
-  print "  * {:.2f}ms ({}) {}".format(
+  print "{:.2f}ms ({}) {}".format(
     rh.request.request_time() * 1000,
     rh.get_status(),
     rh.request.uri,
   )
 
 
+def redis_key(*args):
+  return ':'.join(args)
+
+
+def gen_secret(l):
+  return b64encode(urandom(l))
+
+
 def main():
+  print "{}\n".format(__package__)
+
   # Parse args
   parser = argparse.ArgumentParser(description="dead simple commits feed")
-  parser.add_argument('-s', '--secret', type=str, required=True,
+  parser.add_argument('-s', '--secret', type=str, default=gen_secret(18),
                       help="auth secret")
   parser.add_argument('-p', '--port', type=int, default=5000,
-                      help="port to listen")
+                      help="port")
   parser.add_argument('--redis-prefix', type=str, default='revfeed',
                       help="redis prefix")
   parser.add_argument('--redis-host', type=str, default='localhost',
                       help="redis host")
   parser.add_argument('--redis-port', type=int, default=6379,
                       help="redis port")
+  parser.add_argument('--clear', action='store_true', help="clear feed")
   args = parser.parse_args()
 
   # Setup redis connection
   redis_prefix = args.redis_prefix
   redis_conn = redis.StrictRedis(args.redis_host, args.redis_port)
+
+  # Clear feed if requested
+  if args.clear:
+    count = 0
+    for key in redis_conn.keys(redis_key(redis_prefix, '*')):
+      count += redis_conn.delete(key)
+    print "deleted {} keys".format(count)
+    return
 
   # Setup handlers
   handlers = []
@@ -114,11 +135,11 @@ def main():
   )
 
   app.listen(args.port)
-  print "\n  revfeed\n"
-  print "  * listening to {}".format(args.port)
+  for a in ('secret', 'port'):
+    print "{}={!r}".format(a, getattr(args, a))
 
   # Start IOLoop
   try:
     ioloop.IOLoop.instance().start()
   except (KeyboardInterrupt, SystemExit):
-    print "\n  * stopped"
+    pass
