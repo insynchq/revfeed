@@ -42,7 +42,10 @@ def main():
 
   # Setup handlers
   handlers = []
-  handlers.append((r'/', IndexHandler))
+  handlers.append((r'/', IndexHandler, dict(
+    redis_prefix=redis_prefix,
+    redis_conn=redis_conn,
+  )))
   handlers.append((r'/commits', CommitsHandler, dict(
     secret=args.secret,
     redis_prefix=redis_prefix,

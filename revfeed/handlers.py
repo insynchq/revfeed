@@ -7,24 +7,37 @@ except ImportError:
 
 from tornado import web
 
+from .commit import Commit
 from .utils import redis_key
 
 
-class IndexHandler(web.RequestHandler):
-  def get(self):
-    self.render('index.html')
-
-
-class CommitsHandler(web.RequestHandler):
+class RedisHandler(web.RequestHandler):
 
   def __init__(self, *args, **kwargs):
     self.redis_prefix = kwargs.pop('redis_prefix')
     self.redis_conn = kwargs.pop('redis_conn')
-    self.secret = kwargs.pop('secret')
-    super(CommitsHandler, self).__init__(*args, **kwargs)
+    super(RedisHandler, self).__init__(*args, **kwargs)
 
   def redis_key(self, *args):
     return redis_key(self.redis_prefix, *args)
+
+
+class IndexHandler(RedisHandler):
+
+  def get(self):
+    keys = self.redis_conn.zrevrange(self.redis_key('commits'), 0, 50)
+    p = self.redis_conn.pipeline()
+    for k in keys:
+      p.hgetall(k)
+    commits = [Commit(**c) for c in p.execute()]
+    self.render('index.html', commits=commits)
+
+
+class CommitsHandler(RedisHandler):
+
+  def __init__(self, *args, **kwargs):
+    self.secret = kwargs.pop('secret')
+    super(CommitsHandler, self).__init__(*args, **kwargs)
 
   def post(self):
     # Check auth header
@@ -39,18 +52,17 @@ class CommitsHandler(web.RequestHandler):
 
     # Persist
     data = json.loads(self.request.body)
-    for commit in data['commits']:
-      # Prepare
-      commit['tags'] = ', '.join(commit['tags'])
-      commit['timestamp'], commit['timezone'] = commit.pop('date')
+    for c in data['commits']:
+      commit = Commit(**c)
       # Store
-      commit_key = self.redis_key('commits', commit['repo'], commit['hex'])
+      commit_key = self.redis_key('commits', *commit.key)
+      now = time()
+      score = now + (commit.timestamp + commit.timezone) / now
       self.redis_conn.zadd(
         self.redis_key('commits'),
-        int(time()),
+        score,
         commit_key,
       )
-      self.redis_conn.hmset(commit_key, commit)
+      self.redis_conn.hmset(commit_key, commit.__dict__)
 
     self.write(dict(success=True))
-

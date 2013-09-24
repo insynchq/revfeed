@@ -1,0 +1,62 @@
+* {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: Raleway;
+}
+
+body, input, button, select, textarea {
+  font-family: Asap;
+}
+
+body {
+  color: #444;
+}
+
+h1 {
+  border-bottom: 1px solid;
+}
+
+.revfeed {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1em;
+}
+
+.feed {
+  list-style: none;
+  padding: 0;
+}
+
+.commit {
+  border-bottom: 1px solid;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+
+.commit time {
+  float: right;
+  font-size: 80%;
+}
+
+.commit .details {
+  list-style: none;
+  padding: 0;
+  font-size: 80%;
+}
+
+.commit .details li {
+  display: inline-block;
+  margin-right: 1em;
+}
+
+.commit .details .author {
+  font-weight: bold;
+}
+
+.commit .details .repo,
+.commit .details .branch {
+  border: 1px solid;
+  padding: 0 0.5em;
+}

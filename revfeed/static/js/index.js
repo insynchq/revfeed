@@ -8,4 +8,13 @@ sock.onclose = function() {
   console.log('disconnected');
 }
 
+$('time').each(function() {
+  var $el = $(this);
+  $el.text(
+    moment.unix(
+      parseInt($el.text(), 10)
+    ).utc().calendar()
+  );
+});
+
 })();

@@ -3,14 +3,32 @@
   <head>
     <title>Revfeed</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/2.1.0/normalize.css">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Asap:400,700,400italic,700italic|Raleway:300,400,700">
     <link rel="stylesheet" href="/static/css/index.css">
   </head>
   <body>
-    <h1>Revfeed</h1>
+    <div class="revfeed">
+      <h1>Revfeed</h1>
+      <ul class="feed">
+      {% for commit in commits %}
+        <li class="commit">
+          <time>{{ commit.utc_timestamp }}</time>
+          <p class="message">{{ commit.message }}</p>
+          <ul class="details">
+            <li class="author">{{ commit.author }}</li>
+            <li class="hex">{{ commit.hex }}</li>
+            <li class="repo">{{ commit.repo }}</li>
+            <li class="branch">{{ commit.branch }}</li>
+          </ul>
+        </li>
+      {% end %}
+      </ul>
+    </div>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.2.1/moment.min.js"></script>
     <script src="/static/js/index.js"></script>
   </body>
 </html>
