@@ -1,92 +1,17 @@
-from base64 import b64encode
-from os import urandom
-from time import time
 import argparse
 import pkg_resources
-try:
-  import json
-except ImportError:
-  from simplejson import json
 
 from tornado import web, ioloop
-from sockjs.tornado import SockJSRouter, SockJSConnection
+from sockjs.tornado import SockJSRouter
 import redis
 
-
-class IndexHandler(web.RequestHandler):
-  def get(self):
-    self.render('index.html')
-
-
-class CommitsHandler(web.RequestHandler):
-
-  def __init__(self, *args, **kwargs):
-    self.redis_prefix = kwargs.pop('redis_prefix')
-    self.redis_conn = kwargs.pop('redis_conn')
-    self.secret = kwargs.pop('secret')
-    super(CommitsHandler, self).__init__(*args, **kwargs)
-
-  def redis_key(self, *args):
-    return redis_key(self.redis_prefix, *args)
-
-  def post(self):
-    # Check auth header
-    auth = self.request.headers['Authorization']
-    if not auth.startswith('revfeed-secret'):
-      self.send_error(401)
-      return
-    secret = auth.split(' ', 1)[1]
-    if secret != self.secret:
-      self.send_error(401)
-      return
-
-    # Persist
-    data = json.loads(self.request.body)
-    for commit in data['commits']:
-      # Prepare
-      commit['tags'] = ', '.join(commit['tags'])
-      commit['timestamp'], commit['timezone'] = commit.pop('date')
-      # Store
-      commit_key = self.redis_key('commits', commit['repo'], commit['hex'])
-      self.redis_conn.zadd(
-        self.redis_key('commits'),
-        int(time()),
-        commit_key,
-      )
-      self.redis_conn.hmset(commit_key, commit)
-
-    self.write(dict(success=True))
-
-
-class NotifierConnection(SockJSConnection):
-  def on_open(self, info):
-    pass
-
-  def on_message(self, msg):
-    pass
-
-  def on_close(self):
-    pass
-
-
-def log_request(rh):
-  print "{:.2f}ms ({}) {}".format(
-    rh.request.request_time() * 1000,
-    rh.get_status(),
-    rh.request.uri,
-  )
-
-
-def redis_key(*args):
-  return ':'.join(args)
-
-
-def gen_secret(l):
-  return b64encode(urandom(l))
+from .handlers import IndexHandler, CommitsHandler
+from .notifier import NotifierConnection
+from .utils import log, log_request, redis_key, gen_secret
 
 
 def main():
-  print "{}\n".format(__package__)
+  log("{}\n", __package__)
 
   # Parse args
   parser = argparse.ArgumentParser(description="dead simple commits feed")
@@ -112,7 +37,7 @@ def main():
     count = 0
     for key in redis_conn.keys(redis_key(redis_prefix, '*')):
       count += redis_conn.delete(key)
-    print "deleted {} keys".format(count)
+    log("deleted {} keys", count)
     return
 
   # Setup handlers
@@ -136,7 +61,7 @@ def main():
 
   app.listen(args.port)
   for a in ('secret', 'port'):
-    print "{}={!r}".format(a, getattr(args, a))
+    log("{}={!r}", a, getattr(args, a))
 
   # Start IOLoop
   try:
