@@ -7,12 +7,10 @@ import redis
 
 from .handlers import IndexHandler, CommitsHandler
 from .notifier import NotifierConnection
-from .utils import log, log_request, redis_key, gen_secret
+from .utils import logger, log_request, redis_key, gen_secret
 
 
 def main():
-  log("{}\n", __package__)
-
   # Parse args
   parser = argparse.ArgumentParser(description="dead simple commits feed")
   parser.add_argument('-s', '--secret', type=str, default=gen_secret(18),
@@ -37,7 +35,7 @@ def main():
     count = 0
     for key in redis_conn.keys(redis_key(redis_prefix, '*')):
       count += redis_conn.delete(key)
-    log("deleted {} keys", count)
+    logger.info("deleted {} keys".format(count))
     return
 
   # Setup handlers
@@ -64,7 +62,7 @@ def main():
 
   app.listen(args.port)
   for a in ('secret', 'port'):
-    log("{}={!r}", a, getattr(args, a))
+    logger.info("{}={!r}".format(a, getattr(args, a)))
 
   # Start IOLoop
   try:
