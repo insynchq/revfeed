@@ -3,7 +3,7 @@ from os import urandom
 import logging
 
 
-fmt = logging.Formatter("[%(name)s][%(module)s:%(funcName)s:%(lineno)d]"
+fmt = logging.Formatter("[%(name)s][%(module)s:%(funcName)s:%(lineno)d] "
                         "%(message)s")
 hdlr = logging.StreamHandler()
 hdlr.setFormatter(fmt)
