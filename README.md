@@ -20,7 +20,7 @@ Dead simple commits feed
   revfeedhg =
   ```
   
-3. Set config on hosted repo
+3. Set config on hosted repo's `.hgrc`
 
   ```
   [revfeed]
