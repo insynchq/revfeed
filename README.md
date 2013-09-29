@@ -11,8 +11,8 @@ Dead simple commits feed
 
 ### Mercurial
 
-1. Install `revfeed-hg` on where repo is hosted and where you need to push
-2. Enable in `.hgrc`
+1. Install `revfeed-hg` on where main repo is and where you will be pushing from
+2. Enable in `.hgrc` of main repo and where you will be pushing from
 
   ```
   [extensions]
@@ -20,7 +20,7 @@ Dead simple commits feed
   revfeedhg =
   ```
   
-3. Set config on hosted repo's `.hgrc`
+3. Set config in main repo's `.hgrc`
 
   ```
   [revfeed]
